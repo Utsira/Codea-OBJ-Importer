@@ -2,8 +2,9 @@ function assets()
     shaders()
     Models = {
     
-    {name = "Tank", shade = SpecularShader } --normals = CalculateNormals
-    
+    {name = "Tank", shade = SpecularShader, shininess = 12, specularPower = 12 }, --normals = CalculateNormals,
+    {name = "low poly girl", shade = SpecularShader},
+    {name = "Island lp"  }
     }
 end
 
@@ -183,6 +184,8 @@ uniform float ambient; // --strength of ambient light 0-1
 uniform vec4 light; //--directional light direction (x,y,z,0)
 uniform vec4 lightColor; //--directional light colour
 uniform vec4 eye; // -- position of camera (x,y,z,1)
+uniform float specularPower; //higher number = smaller, harder highlight
+uniform float shininess;
 
 varying lowp vec4 vNormal;
 varying lowp vec4 vPosition;
@@ -199,8 +202,8 @@ void main()
     //specular blinn-phong
     vec4 cameraDirection = normalize( eye - vPosition );
     vec4 halfAngle = normalize( cameraDirection + lightDirection );
-    float spec = pow( max( 0.0, dot( norm, halfAngle)), 12. );//last number is specularPower, higher number = smaller highlight
-    lowp vec4 specular = lightColor  * spec * 12.; // add optional shininess at end here
+    float spec = pow( max( 0.0, dot( norm, halfAngle)), specularPower );
+    lowp vec4 specular = lightColor  * spec * shininess; 
 
     vec4 totalColor = ambientLight + diffuse + specular;
     totalColor.a=vColor.a;
@@ -246,6 +249,8 @@ uniform float ambient; // --strength of ambient light 0-1
 uniform vec4 light; //--directional light direction (x,y,z,0)
 uniform vec4 lightColor; //--directional light colour
 uniform vec4 eye; // -- position of camera (x,y,z,1)
+uniform float specularPower; //higher number = smaller highlight
+uniform float shininess;
 
 varying lowp vec4 vNormal;
 varying lowp vec4 vPosition;
@@ -263,8 +268,8 @@ void main()
     //specular blinn-phong
     vec4 cameraDirection = normalize( eye - vPosition );
     vec4 halfAngle = normalize( cameraDirection + lightDirection );
-    float spec = pow( max( 0.0, dot( norm, halfAngle)), 64. );//last number is specularPower, higher number = smaller highlight
-    lowp vec4 specular = lightColor  * spec * 1.2; // add optional shininess at end here
+    float spec = pow( max( 0.0, dot( norm, halfAngle)), specularPower );
+    lowp vec4 specular = lightColor  * spec * shininess; 
 
     vec4 totalColor = ambientLight + diffuse + specular;
     totalColor.a=vColor.a;

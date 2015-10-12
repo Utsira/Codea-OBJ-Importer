@@ -27,6 +27,8 @@ function OBJ.load(data) --name = filename (without extension), normals = functio
         shade =  DiffuseTexShader
     end    
     m.shader=shade
+    m.shader.shininess = data.shininess or 1.2 --settings for specular shader
+    m.shader.specularPower = data.specularPower or 32
     
     return m
 end

@@ -15,13 +15,13 @@ function setup()
     parameter.action("Load", function()
         local t = os.time()
         model = Mesh{mesh = OBJ.load(Models[Choose]) }
+        setView()
         print (os.time()-t, "seconds")
     end)
-    parameter.action("Reset camera", function() cam = vec3(0,0,-65) rot = matrix() end)
+    parameter.action("Reset camera", setView)
     parameter.watch("FPS")
     FPS=0
-    cam = vec3(0,0,-65) 
-    rot = matrix() 
+    setView()
     --print model list
     for i,v in ipairs(Models) do
         print(i,v.name)
@@ -29,8 +29,12 @@ function setup()
 
 end
 
+function setView()
+    cam = vec3(0,0,-65) 
+    rot = matrix() 
+end
+
 function draw()
-    processTouches()
     background(116, 173, 182, 255)
     text("Drag with 1 finger to rotate model on x and y\nDrag 2 fingers to pan\nPinch to track in and out\nTwist with 2 fingers to rotate around z")
     FPS=FPS*0.9+0.1/DeltaTime
@@ -45,30 +49,30 @@ function clamp(v,low,high)
     return math.min(math.max(v, low), high)
 end
 
-function processTouches()
+function processTouches(t)
     local dx,dy = 0,0
     local tArray = {}
     local inv = rot:inverse() --get the inverse of the model matrix (or transpose?), in order to convert global touches into local rotations, so that eg a swipe left always rotates the model left, regardless of the model's local orientation
-    local x = inv * vec3(1,0,0) --our 3 global axis converted to local space
+    local x = inv * vec3(1,0,0) --our 3 global axes converted to local space
     local y = inv * vec3(0,1,0)
     local z = inv * vec3(0,0,1)
     --tally up the touches
     for _,t in pairs(touches) do
         dx = dx + t.deltaX
         dy = dy + t.deltaY
-        tArray[#tArray+1] = vec2(t.x, t.y)
+        tArray[#tArray+1] = {id = t.id, pos = vec2(t.x, t.y)}
     end
     if #tArray == 1 then
         --rotate around x and y axis
         rot = rot:rotate(dy, x:unpack())
         rot = rot:rotate(dx, y:unpack())
-    elseif #tArray == 2 then
+    elseif #tArray == 2 and t.id == tArray[2].id then --only process two-fingered gesture once
         --pinch to zoom
-        local diff = tArray[2] - tArray[1]
+        local diff = tArray[2].pos - tArray[1].pos
         local pinchDist = diff:len() 
         local pinchDiff = pinchDist - (lastPinchDist or pinchDist)
         lastPinchDist = pinchDist
-        --nb zoom and pan ammount is proportional to camera distance
+        --nb zoom and pan amount is proportional to camera distance
         cam.z = clamp(cam.z + pinchDiff * cam.z * -0.01, -2000, -5)    
         --2 finger drag to pan
         cam.x = cam.x + dx * cam.z * -0.0005
@@ -88,6 +92,7 @@ function touched(t)
         lastPinchAngle = nil
     else
         touches[t.id] = t
+        processTouches(t)
     end
 end
 
@@ -96,8 +101,9 @@ function assets()
     shaders()
     Models = {
     
-    {name = "Tank", shade = SpecularShader } --normals = CalculateNormals
-    
+    {name = "Tank", shade = SpecularShader, shininess = 12, specularPower = 12 }, --normals = CalculateNormals,
+    {name = "low poly girl", shade = SpecularShader},
+    {name = "Island lp"  }
     }
 end
 
@@ -277,6 +283,8 @@ uniform float ambient; // --strength of ambient light 0-1
 uniform vec4 light; //--directional light direction (x,y,z,0)
 uniform vec4 lightColor; //--directional light colour
 uniform vec4 eye; // -- position of camera (x,y,z,1)
+uniform float specularPower; //higher number = smaller, harder highlight
+uniform float shininess;
 
 varying lowp vec4 vNormal;
 varying lowp vec4 vPosition;
@@ -293,8 +301,8 @@ void main()
     //specular blinn-phong
     vec4 cameraDirection = normalize( eye - vPosition );
     vec4 halfAngle = normalize( cameraDirection + lightDirection );
-    float spec = pow( max( 0.0, dot( norm, halfAngle)), 12. );//last number is specularPower, higher number = smaller highlight
-    lowp vec4 specular = lightColor  * spec * 12.; // add optional shininess at end here
+    float spec = pow( max( 0.0, dot( norm, halfAngle)), specularPower );
+    lowp vec4 specular = lightColor  * spec * shininess; 
 
     vec4 totalColor = ambientLight + diffuse + specular;
     totalColor.a=vColor.a;
@@ -340,6 +348,8 @@ uniform float ambient; // --strength of ambient light 0-1
 uniform vec4 light; //--directional light direction (x,y,z,0)
 uniform vec4 lightColor; //--directional light colour
 uniform vec4 eye; // -- position of camera (x,y,z,1)
+uniform float specularPower; //higher number = smaller highlight
+uniform float shininess;
 
 varying lowp vec4 vNormal;
 varying lowp vec4 vPosition;
@@ -357,8 +367,8 @@ void main()
     //specular blinn-phong
     vec4 cameraDirection = normalize( eye - vPosition );
     vec4 halfAngle = normalize( cameraDirection + lightDirection );
-    float spec = pow( max( 0.0, dot( norm, halfAngle)), 64. );//last number is specularPower, higher number = smaller highlight
-    lowp vec4 specular = lightColor  * spec * 1.2; // add optional shininess at end here
+    float spec = pow( max( 0.0, dot( norm, halfAngle)), specularPower );
+    lowp vec4 specular = lightColor  * spec * shininess; 
 
     vec4 totalColor = ambientLight + diffuse + specular;
     totalColor.a=vColor.a;
@@ -436,6 +446,8 @@ function OBJ.load(data) --name = filename (without extension), normals = functio
         shade =  DiffuseTexShader
     end    
     m.shader=shade
+    m.shader.shininess = data.shininess or 1.2 --settings for specular shader
+    m.shader.specularPower = data.specularPower or 32
     
     return m
 end
