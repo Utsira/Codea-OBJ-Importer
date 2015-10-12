@@ -32,16 +32,17 @@ end
 function draw()
     processTouches()
     background(116, 173, 182, 255)
-    text("Drag with one finger to rotate model\nDrag two fingers to pan\nPinch to track in and out")
+    text("Drag with 1 finger to rotate model on x and y\nDrag 2 fingers to pan\nPinch to track in and out\nRotate 2 fingers to rotate around z")
     FPS=FPS*0.9+0.1/DeltaTime
 
     perspective() 
     camera(cam.x, cam.y,cam.z, cam.x, cam.y,0)
     pushMatrix()
     
+    rotate(rot.z)
     rotate(rot.x,1,0,0)
     rotate(rot.y,0,1,0)
-    rotate(rot.z)
+
     if model then model:draw() end
     popMatrix()
  
@@ -63,15 +64,20 @@ function processTouches()
         rot.x = rot.x - dy
         rot.y = rot.y + dx
     elseif #tArray == 2 then
-        local pinchDist = tArray[1]:dist(tArray[2])
-       -- rot.z = -math.deg(tArray[1]:angleBetween(tArray[2]))
+        local diff = tArray[2] - tArray[1]
+        local pinchDist = diff:len() --tArray[1]:dist(tArray[2])
+        local pinchAngle = -math.deg(math.atan(diff.y, diff.x))
+        
         local pinchDiff = pinchDist - (lastPinchDist or pinchDist)
- 
+        local angleDiff = pinchAngle - (lastPinchAngle or pinchAngle)
+        rot.z = rot.z + angleDiff
+        
         cam.x = cam.x + dx * cam.z * -0.0005
         cam.y = cam.y - dy * cam.z * -0.0005  
         cam.z = clamp(cam.z + pinchDiff * cam.z * -0.01, -2000, -5)
 
         lastPinchDist = pinchDist
+        lastPinchAngle = pinchAngle
     end
 end
 
@@ -79,6 +85,7 @@ function touched(t)
     if t.state == ENDED or t.state == CANCELLED then
         touches[t.id] = nil
         lastPinchDist = nil
+        lastPinchAngle = nil
     else
         touches[t.id] = t
     end
