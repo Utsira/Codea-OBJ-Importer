@@ -103,7 +103,8 @@ function assets()
     
     {name = "Tank", shade = SpecularShader, shininess = 12, specularPower = 12 }, --normals = CalculateNormals,
     {name = "low poly girl", shade = SpecularShader},
-    {name = "Island lp"  }
+    {name = "Island lp"  },
+    {name = "robot", shade = SpecularShader, shininess = 12, specularPower = 32}
     }
 end
 
@@ -436,7 +437,9 @@ function OBJ.load(data) --name = filename (without extension), normals = functio
     m.vertices=obj.v    
     if #obj.t>0 then m.texCoords=obj.t end
     if #obj.n>0 then m.normals=obj.n end
-    if #obj.c>0 then m.colors=obj.c end 
+    if #obj.c>0 then m.colors=obj.c 
+    else m:setColors(color(255))
+    end 
     
     --texture and shader
     local shade = data.shade or DiffuseShader
