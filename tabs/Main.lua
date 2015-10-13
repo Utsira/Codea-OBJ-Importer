@@ -7,6 +7,7 @@ local touches, tArray, lastPinchDist = {}, {}
 
 function setup() 
     textMode(CORNER)
+    strokeWidth(3)
     fill(40)
     assets()
 
@@ -19,7 +20,13 @@ function setup()
     end)
     parameter.action("Reset camera", setView)
     parameter.action("Wireframe Mode", function()
-        if model.mesh then wireframe.set(model.mesh) else alert("Load a model first") end
+        if model and model.mesh then wireframe.set(model.mesh) else alert("Load a model first") end
+    end)
+    parameter.number("WireframeStrokeWidth", 0.5, 15, strokeWidth(), function() 
+        if model and model.mesh then 
+            strokeWidth(WireframeStrokeWidth)
+            model.mesh.shader.strokeWidth = WireframeStrokeWidth 
+        end
     end)
     parameter.watch("FPS")
     FPS=0
@@ -38,13 +45,17 @@ end
 
 function draw()
     background(116, 173, 182, 255)
-    text("Drag with 1 finger to rotate model on x and y\nDrag 2 fingers to pan\nPinch to track in and out\nTwist with 2 fingers to rotate around z")
+
     FPS=FPS*0.9+0.1/DeltaTime
 
     perspective() 
     camera(cam.x, cam.y,cam.z, cam.x, cam.y,0)
     modelMatrix(rot)
     if model then model:draw() end
+    ortho()
+    viewMatrix(matrix())
+    resetMatrix()
+    text("Drag with 1 finger to rotate model on x and y\nDrag 2 fingers to pan\nPinch to track in and out\nTwist with 2 fingers to rotate around z")
 end
 
 function clamp(v,low,high)
@@ -54,10 +65,10 @@ end
 function processTouches(t)
     local dx,dy = 0,0
     local tArray = {}
-    local inv = rot:inverse() --get the inverse of the model matrix (or transpose?), in order to convert global touches into local rotations, so that eg a swipe left always rotates the model left, regardless of the model's local orientation
-    local x = inv * vec3(1,0,0) --our 3 global axes converted to local space
-    local y = inv * vec3(0,1,0)
-    local z = inv * vec3(0,0,1)
+    local i = rot:inverse() --get the inverse of the model matrix (or transpose?), in order to convert global touches into local rotations, so that eg a swipe left always rotates the model left, regardless of the model's local orientation
+    local x = vec3(i[1], i[2], i[3]) --our 3 global axes converted to local space
+    local y = vec3(i[5], i[6], i[7]) 
+    local z = vec3(i[9], i[10], i[11]) 
     --tally up the touches
     for _,t in pairs(touches) do
         dx = dx + t.deltaX
@@ -76,9 +87,8 @@ function processTouches(t)
         lastPinchDist = pinchDist
         --nb zoom and pan amount is proportional to camera distance
         cam.z = clamp(cam.z + pinchDiff * cam.z * -0.01, -2000, -5)    
-        --2 finger drag to pan
-        cam.x = cam.x + dx * cam.z * -0.0005
-        cam.y = cam.y - dy * cam.z * -0.0005      
+        --2 finger drag to pan 
+        rot = rot:translate( (((dy * y) - (dx * x)) * cam.z * -0.0005):unpack()) 
         --twist to rotate
         local pinchAngle = -math.deg(math.atan(diff.y, diff.x))
         local angleDiff = pinchAngle - (lastPinchAngle or pinchAngle)
