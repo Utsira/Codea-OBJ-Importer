@@ -18,6 +18,9 @@ function setup()
         print (os.time()-t, "seconds")
     end)
     parameter.action("Reset camera", setView)
+    parameter.action("Wireframe Mode", function()
+        if model.mesh then wireframe.set(model.mesh) else alert("Load a model first") end
+    end)
     parameter.watch("FPS")
     FPS=0
     setView()
