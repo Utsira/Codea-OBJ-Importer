@@ -12,6 +12,8 @@ An importer to bring 3D models in the popular .obj format into Codea
 
 ![wireframe mode](https://raw.githubusercontent.com/Utsira/Codea-OBJ-Importer/master/screenshots/asset-2.jpg)
 
+![thick wireframe](https://raw.githubusercontent.com/Utsira/Codea-OBJ-Importer/master/screenshots/wireframe.jpg)
+
 ## To install:
 
 1. Install the Codea OBJ Importer in Codea (copy the entire contents of the /Codea OBJ Importer Installer.lua file to the clipboard. In the Codea projects page, long press "+ add new project" and select "paste into project")
