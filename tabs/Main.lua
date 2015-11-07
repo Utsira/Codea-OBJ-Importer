@@ -2,6 +2,7 @@
 
 --assumes each object has only one texture image
 --currently only supports one object per file
+--todo: remote images
 
 local touches, tArray, lastPinchDist = {}, {}
 
@@ -12,11 +13,15 @@ function setup()
     assets()
 
     parameter.integer("Choose",1,#Models,1)
+    parameter.boolean("save_model_to_Dropbox", false)
     parameter.action("Load", function()
+        --[[
         local t = os.time()
         model = Mesh{mesh = OBJ.load(Models[Choose]) }
         setView()
         print (os.time()-t, "seconds")
+          ]]
+        loadModel1(Models[Choose])
     end)
     parameter.action("Reset camera", setView)
     parameter.action("Wireframe Mode", function()

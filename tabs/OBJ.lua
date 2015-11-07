@@ -2,14 +2,11 @@
 
 OBJ={}
 
-OBJ.assetPath="Dropbox:" --path for assets
-OBJ.ioPath = os.getenv("HOME").."/Documents/Dropbox.assetpack/" --same path for files not recognised as assets. Although .obj and .mtl are text files, because they do not have the .txt suffix they are not accessible with readText or the asset picker. Therefore we use io.read, which requires a full path. 
-
-function OBJ.load(data) --name = filename (without extension), normals = function to calculate normals, defaults to average normals, shade = shader, defaults to DiffuseShader
-    local name = data.name
-    local mtl = OBJ.parseMtl(name)  --the mtl material file
+function OBJ.load(data) --obj , mtl, normals = function to calculate normals, defaults to average normals, shade = shader, defaults to DiffuseShader
+   -- local name = data.name
+    local mtl = OBJ.parseMtl(data.mtl)  --the mtl material file
     local normals = data.normals or CalculateAverageNormals --the function that will be used to calculate the normals
-    local obj = OBJ.parse(name, mtl, normals) --the object file
+    local obj = OBJ.parse(data.obj, mtl, normals) --the object file
     
     --create mesh
     local m=mesh()   
@@ -34,23 +31,7 @@ function OBJ.load(data) --name = filename (without extension), normals = functio
     return m
 end
 
-function OBJ.getFile(name, ext) --this could just be replaced with readText, if readText could see .obj and .mtl
-    --attempt to open .obj file
-    local path = OBJ.ioPath..name..ext
-    local file, err = io.open(path, "r")
-    local data
-    if file then
-        data=file:read("*all")
-        print(name..ext, ": ", data:len(), " bytes")
-        file:close()
-    else 
-        print(name, err)
-    end
-    return data
-end
-
-function OBJ.parse(name,material, normals)
-    local data = OBJ.getFile(name, ".obj")
+function OBJ.parse(data,material, normals)
     
     local p, v, tx, t, np, n, c={},{},{},{},{},{},{} 
     
@@ -82,12 +63,11 @@ function OBJ.parse(name,material, normals)
         end
     end
     if #n<#v then n=normals(v) end
-    print (name..": "..#v.." vertices processed")
+    print (#v.." vertices processed") --name..": "..
     return {v=v, t=t, c=c, n=n}
 end
 
-function OBJ.parseMtl(name)
-    local data = OBJ.getFile(name, ".mtl")
+function OBJ.parseMtl(data)
     local mtl={}
     local mname, map, path
     

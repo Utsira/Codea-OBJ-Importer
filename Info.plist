@@ -10,6 +10,8 @@
 		<string>Assets</string>
 		<string>Mesh</string>
 		<string>OBJ</string>
+		<string>readAsset</string>
+		<string>RequestMany</string>
 		<string>Wireframe</string>
 	</array>
 	<key>Created</key>

@@ -7,6 +7,7 @@ function assets()
     {name = "Island lp"  },
     {name = "robot", shade = SpecularShader, shininess = 12, specularPower = 32}
     }
+  
 end
 
 function shaders()
