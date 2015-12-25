@@ -1,3 +1,4 @@
+
 --# Main
 --Simple Blender .obj loader
 
@@ -6,6 +7,7 @@
 --todo: remote images
 
 local touches, tArray, lastPinchDist = {}, {}
+displayMode(OVERLAY)
 
 function setup() 
     textMode(CORNER)
@@ -61,6 +63,7 @@ function draw()
     ortho()
     viewMatrix(matrix())
     resetMatrix()
+    translate(WIDTH*0.4, 0)
     text("Drag with 1 finger to rotate model on x and y\nDrag 2 fingers to pan\nPinch to track in and out\nTwist with 2 fingers to rotate around z")
 end
 
@@ -92,7 +95,7 @@ function processTouches(t)
         local pinchDiff = pinchDist - (lastPinchDist or pinchDist)
         lastPinchDist = pinchDist
         --nb zoom and pan amount is proportional to camera distance
-        cam.z = clamp(cam.z + pinchDiff * cam.z * -0.01, -2000, -5)    
+        cam.z = clamp(cam.z + pinchDiff * cam.z * -0.01, -2000, -1)    
         --2 finger drag to pan 
         rot = rot:translate( (((dy * y) - (dx * x)) * cam.z * -0.0005):unpack()) 
         --twist to rotate
@@ -122,7 +125,8 @@ function assets()
     {name = "Tank", shade = SpecularShader, shininess = 12, specularPower = 12 }, --normals = CalculateNormals,
     {name = "low poly girl", shade = SpecularShader},
     {name = "Island lp"  },
-    {name = "robot", shade = SpecularShader, shininess = 12, specularPower = 32}
+    {name = "robot", shade = SpecularShader, shininess = 12, specularPower = 32},
+    {name = "XWing", shade = SpecularShader, shininess = .5, specularPower = 6 }
     }
   
 end
