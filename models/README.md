@@ -30,3 +30,9 @@ Model by InfameDavid
 http://www.blendswap.com/blends/view/50244
 Licence: CC BY
 Model by PixelOz
+
+#### Stormtrooper Helmet
+
+http: http://www.blendswap.com/blends/view/77957
+Licence: CC-BY 
+Model by matpiet, mofx
