@@ -20,10 +20,10 @@ function OBJ.load(data) --obj , mtl, normals = function to calculate normals, de
     
     --texture and shader
     local shade = data.shade or DiffuseShader
-    if mtl.texture then
-        local tex=OBJ.assetPath..mtl.texture
-        m.texture=tex
-        shade =  DiffuseTexShader
+    if data.texture then
+
+        m.texture=data.texture
+
     end    
     m.shader=shade
     m.shader.shininess = data.shininess or 1.2 --settings for specular shader
@@ -91,13 +91,6 @@ function OBJ.parseMtl(data)
         end
     end
     
-    if map then
-        local y=readImage(OBJ.assetPath..map)
-        if not y then
-            alert(map.."Use path “copy” in Blender .obj export", "Image not found")
-            return
-        end
-    end
     return {mtl=mtl, texture=map} 
 end
 
