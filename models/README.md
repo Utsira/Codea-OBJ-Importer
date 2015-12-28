@@ -36,3 +36,9 @@ Model by PixelOz
 http: http://www.blendswap.com/blends/view/77957
 Licence: CC-BY 
 Model by matpiet, mofx
+
+#### Tie Fighter
+
+http: http://www.blendswap.com/blends/view/80537
+Licence: CC Zero
+Model by Daniel 74
