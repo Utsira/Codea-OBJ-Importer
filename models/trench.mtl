@@ -1,4 +1,4 @@
-# Blender MTL File: 'trench_run_sketchfab.blend'
+# Blender MTL File: 'Trench.blend'
 # Material Count: 1
 
 newmtl trench1
@@ -9,4 +9,4 @@ Ks 0.500000 0.500000 0.500000
 Ni -1.000000
 d 1.000000
 illum 2
-map_Kd trench_1_texture0.png
+map_Kd TieFighter.jpg
