@@ -128,6 +128,7 @@ function assets()
     {name = "robot", shade = SpecularShader, shininess = 12, specularPower = 32},
     {name = "XWing", shade = SpecularShader, shininess = .5, specularPower = 6 },
     {name = "stormtrooperhelmet", texture = "hELMET_ao.png", shade = SpecularTexShader, shininess = .5, specularPower = 6 },
+    {name = "TieFighter", texture = "TieFighter", shade = SpecularShader, shininess = .5, specularPower = 6 },
     }
   
 end
