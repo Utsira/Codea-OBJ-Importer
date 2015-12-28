@@ -128,9 +128,9 @@ function assets()
     {name = "robot", shade = SpecularShader, shininess = 12, specularPower = 32},
     {name = "XWing", shade = SpecularShader, shininess = .5, specularPower = 6 },
     {name = "stormtrooperhelmet", texture = "hELMET_ao.png", shade = SpecularTexShader, shininess = .5, specularPower = 6 },
-    {name = "TieFighter", texture = "TieFighter", shade = SpecularShader, shininess = .5, specularPower = 6 },
+    {name = "TieFighter", texture = "TieFighter.jpg", shade = SpecularTexShader, shininess = .5, specularPower = 6 },
+    {name = "trench", texture = "TieFighter.jpg", shade = DiffuseTexShader, shininess = .5, specularPower = 6 }, --trench_1_texture0.png
     }
-  
 end
 
 function shaders()
