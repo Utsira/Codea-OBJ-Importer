@@ -1,4 +1,4 @@
-local url = "https://raw.githubusercontent.com/Utsira/Codea-OBJ-Importer/master/tabs/"
+local url = "https://raw.githubusercontent.com/Utsira/Codea-OBJ-Importer/master/BlenderOBJImporter.codea/"
  
 
 local function install(data)
