@@ -1,6 +1,7 @@
 --Trench Run
 
 local touches, tArray, lastPinchDist = {}, {}
+displayMode(OVERLAY)
 displayMode(FULLSCREEN)
 
 function setup() 

@@ -4,7 +4,7 @@ function checkAssets()
 
     {name = "XWing", shade = SpecularShader, shininess = .5, specularPower = 6 },
     {name = "TieFighter", texture = "TieFighter.jpg", shade = DiffuseTexShader, shininess = .5, specularPower = 6 },
-    {name = "trench", texture = "TieFighter.jpg", shade = shader(DiffuseTex.vertInst, DiffuseTex.frag), normals = CalculateNormals, inverseNormals = -1}, --trench_1_texture0.png
+    {name = "trench", texture = "TieFighter.jpg", shade = shader(DiffuseTex.vert, DiffuseTex.frag), normals = CalculateNormals, inverseNormals = -1}, --trench_1_texture0.png --vertInst
     }
     
     local missing, missingArray = {}, {} --first pass use key-value to catch duplicate file names
@@ -121,7 +121,7 @@ end
 function shaders()
     DiffuseShader = shader(Diffuse.vert, Diffuse.frag)
     DiffuseTexShader = shader(DiffuseTex.vert, DiffuseTex.frag)
-    DiffuseTexTileShader = shader(DiffuseTex.vert, DiffuseTexTile.frag)
+  --  DiffuseTexTileShader = shader(DiffuseTex.vert, DiffuseTexTile.frag)
     SpecularShader = shader(DiffuseSpecular.vert, DiffuseSpecular.frag)
     SpecularTexShader = shader(DiffuseSpecularTex.vert, DiffuseSpecularTex.frag)
 end
@@ -147,7 +147,9 @@ void main()
 {
     vNormal = normalize(modelMatrix * vec4( normal, 0.0 ));
     vPosition = modelMatrix * position;
-    vColor = color * flash;
+    //vColor = color * flash;
+     float dist = clamp((vPosition.z * 0.004), 0.0, 1.1);
+      vColor = mix(color, vec4(0.,0.,0.,1.), dist) * flash;
     vTexCoord = texCoord;
     gl_Position = modelViewProjection * position;
 }
@@ -191,7 +193,7 @@ precision highp float;
 
 uniform lowp sampler2D texture;
 uniform float ambient; // --strength of ambient light 0-1
-uniform vec4 light; //--directional light direction (x,y,z,0), or point light position (x,y,z,1)
+uniform vec4 light; //--directional light direction (x,y,z,0), 
 uniform vec4 lightColor; //--directional light colour
 
 varying lowp vec4 vNormal;
@@ -204,8 +206,8 @@ void main()
     lowp vec4 pixel= texture2D( texture, vTexCoord ) * vColor; 
     lowp vec4 ambientLight = pixel * ambient;
     lowp vec4 norm = normalize(vNormal);
-    lowp vec4 lightDirection = normalize (light - vPosition * light.w);
-    lowp vec4 diffuse = pixel * lightColor * max( 0.0, dot( norm, lightDirection ));
+   // lowp vec4 lightDirection = normalize (light - vPosition * light.w);
+    lowp vec4 diffuse = pixel * lightColor * max( 0.0, dot( norm, light ));
     vec4 totalColor = ambientLight + diffuse;
     totalColor.a=vColor.a;
     gl_FragColor=totalColor;
@@ -339,12 +341,12 @@ void main()
 
     lowp vec4 ambientLight = vColor * ambient;
     lowp vec4 norm = normalize(vNormal);
-    lowp vec4 lightDirection = normalize(light - vPosition * light.w);
-    lowp vec4 diffuse = vColor * lightColor * max( 0.0, dot( norm, lightDirection ));
+  //  lowp vec4 lightDirection = normalize(light - vPosition * light.w);
+    lowp vec4 diffuse = vColor * lightColor * max( 0.0, dot( norm, light ));
 
     //specular blinn-phong
     vec4 cameraDirection = normalize( eye - vPosition );
-    vec4 halfAngle = normalize( cameraDirection + lightDirection );
+    vec4 halfAngle = normalize( cameraDirection + light );
     float spec = pow( max( 0.0, dot( norm, halfAngle)), specularPower );
     lowp vec4 specular = lightColor  * spec * shininess; 
 

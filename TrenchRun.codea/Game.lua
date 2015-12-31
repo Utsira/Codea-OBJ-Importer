@@ -5,8 +5,15 @@ function Game.init(wire)
     deviceOri = vec2(Gravity.x, Gravity.y) --current device position
     fontSize(30)
     model.trench:setColors(
-    color(79, 91, 131, 255)) --(203, 220, 255, 255)) --tint the trench so that the craft stand out against it
-    Mesh{pos = vec3(0,0,0), mesh = model.trench, instances = 20, scenery = true} --trench, drawn with instancing
+    color(203, 220, 255, 255)) --tint the trench so that the craft stand out against it
+   -- Mesh{pos = vec3(0,0,0), mesh = model.trench, instances = 20, scenery = true} --trench, drawn with instancing
+    for i = 0,19 do
+        --local a,b = math.floor((i%4)/2), math.floor(((i+1)%4)/2)
+        local a = i % 2
+        local m = matrix():translate(0,0,i*trenchSize):rotate(a*180, 0,1,0) --:scale(b*-1,0,0) --
+      --  Mesh{pos = vec3(0,0,i*trenchSize), angle = vec3(0, a*180, 0), mesh = model.trench, instances = 1, scenery = true}
+        MeshStatic{matrix = m, mesh = model.trench, scenery = true}
+    end
     player = Player{pos = vec3(0,6.3,0)} --player
     wave = Wave() --waves
     score = 0
@@ -59,7 +66,7 @@ function Game.draw()
         v:draw()
     end
     --loop the trench by bringing every moving object back one segment every few frames
-    if player.pos.z>25.2 then globalOffset = 25.2
+    if player.pos.z>25.2 then globalOffset = 25.2 --25.2
     else globalOffset = 0 end
     -- back to 2D to draw the hud
     ortho()

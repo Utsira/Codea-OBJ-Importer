@@ -11,6 +11,7 @@
 		<string>Game</string>
 		<string>GameOver</string>
 		<string>Mesh</string>
+		<string>MeshStatic</string>
 		<string>Explosion</string>
 		<string>Ship</string>
 		<string>Player</string>
